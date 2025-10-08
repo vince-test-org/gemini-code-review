@@ -1,0 +1,26 @@
+name: Auto trigger AI review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post /gemini-review if not already present
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if gh api repos/$REPO/issues/$PR_NUMBER/comments --paginate --jq '.[].body' | grep -q '^/gemini-review\b'; then
+            echo "Comment already exists. Skipping."
+          else
+            gh api repos/$REPO/issues/$PR_NUMBER/comments -f body='/gemini-review'
+            echo "Posted /gemini-review."
+          fi
