@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+# gemini-cli settings
+.gemini/
+
+# GitHub App credentials
+gha-creds-*.json
